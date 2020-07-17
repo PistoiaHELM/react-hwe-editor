@@ -17,8 +17,15 @@ Email us at info@openHELM.org
 
 The HELM Web Editor react (HWE) is a react based implementation of HELM. The webeditor depends on a a set of services which have been split into modules for easier maintenance. The diagram below shows the relationship between the components. 
 
-
 ![](https://github.com/ClairePA/pistoiahelm.github.com/blob/master/images/ArchitectureOverview.png?raw=true)
+
+## Install
+
+```bash
+npm install --save postscribe
+npm install --save styled-components
+npm install --save @pistoiahelm/react-hwe-editor@latest --registry=https://npm.pkg.github.com
+```
 
 # Important Notes #
 The HWE react component has several props to note (example usage below): 
@@ -28,16 +35,10 @@ The HWE react component has several props to note (example usage below):
 
 [![NPM](https://img.shields.io/npm/v/react-hwe-editor.svg)](https://www.npmjs.com/package/react-hwe-editor) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-If you want to use the default urls for monomer dbs, include a proxy to http://webeditor.openhelm.org in your package.json: 
+If you want to use the default urls for monomer dbs, include a proxy to http://webeditor.openhelm.org in your own project's package.json: 
 
 ```js
 "proxy": "http://webeditor.openhelm.org"
-```
-
-## Install
-
-```bash
-npm install --save react-hwe-editor
 ```
 
 ## Usage
