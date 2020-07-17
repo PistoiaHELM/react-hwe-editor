@@ -1,10 +1,12 @@
 {
   "name": "@pistoiahelm/react-hwe-editor",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "React based implementation of HELM Web Editor.",
   "author": "Joshua Ren",
   "license": "MIT",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "repository": "https://github.com/PistoiaHELM/react-hwe-editor",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
@@ -53,7 +55,8 @@
     "dist"
   ],
   "dependencies": {
-    "@pistoiahelm/react-hwe-deps": "^1.0.0",
+    "@pistoiahelm/react-hwe-deps": "^1.0.3",
+    "postscribe": "^2.0.8",
     "styled-components": "^5.1.1"
   }
 }

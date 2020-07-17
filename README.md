@@ -51,7 +51,7 @@ import React, {useState} from 'react';
 import Styled from 'styled-components';
 import Popup from "reactjs-popup";
 
-import HWE from 'react-hwe-editor';
+import HWE from '@pistoiahelm/react-hwe-editor';
 
 const ExContainer = Styled.div`
     margin: auto;

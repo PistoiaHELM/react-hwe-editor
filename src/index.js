@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import Styled from 'styled-components';
 
-import loadDeps from 'react-hwe-deps' // custom npm repo
+import loadDeps from '@pistoiahelm/react-hwe-deps' // custom npm repo
  
 const FullSizeDiv = Styled.div`
     height:100%; 
