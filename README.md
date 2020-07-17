@@ -25,6 +25,7 @@ The HELM Web Editor react (HWE) is a react based implementation of HELM. The web
 npm install --save postscribe
 npm install --save styled-components
 npm install --save @pistoiahelm/react-hwe-editor@latest --registry=https://npm.pkg.github.com
+npm audit fix
 ```
 
 # Important Notes #
