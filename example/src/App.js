@@ -18,8 +18,8 @@ const ExContainer = Styled.div`
 `;
 
 const App = () => {
-    var { getEditor, editorProps, getViewer, getMolecularProps } = useHWE('a');
-    const HWE = getEditor();
+    var { editor, editorProps, viewer, getMolecularProps } = useHWE({},'a');
+    const HWE = editor();
  
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
     const [helm, setHELM] = useState('');
@@ -29,7 +29,7 @@ const App = () => {
 
     // load hwe information into state vars
     const setDisplay = () => {
-      document.getElementById('canvas').innerHTML = getViewer();
+      document.getElementById('canvas').innerHTML = viewer().innerHTML;
       var molecularProps = getMolecularProps();
       setHELM(molecularProps.helm);
       setMF(molecularProps.mf);
@@ -57,7 +57,7 @@ const App = () => {
             </tbody>
           </table>
           <Popup modal contentStyle={{width: "100%"}} trigger={<button>Open HWE</button>} onClose={setDisplay}>
-            <HWE {...editorProps}/>
+              <HWE {...editorProps}/>
           </Popup>
         </div>
     );

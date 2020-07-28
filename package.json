@@ -1,6 +1,6 @@
 {
   "name": "@pistoiahelm/react-hwe-editor",
-  "version": "1.1.8",
+  "version": "1.2.3",
   "description": "React based implementation of HELM Web Editor.",
   "author": "Joshua Ren",
   "license": "MIT",

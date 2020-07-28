@@ -29,10 +29,10 @@ npm audit fix
 ```
 
 # Important Notes #
-The HWE react component has several props to note (example usage below): 
- *   helmNotation: input helm notation to be rendered/analyzed by HWE
- *   helmCallback: callback after exiting HWE, contains div with the svg image and JSON stringified object containing the helm notation, molecular formula, weight, and extinction coefficient
- *   customConfig: custom configuration settings for HWE
+The useHWE react hook has several parameters to note (example usage below): 
+ *   customConfig: custom configuration settings for HWE  
+ *   initHelm: input helm notation to be rendered/analyzed by HWE
+ 
 
 [![NPM](https://img.shields.io/npm/v/react-hwe-editor.svg)](https://www.npmjs.com/package/react-hwe-editor) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
@@ -52,40 +52,36 @@ import React, {useState} from 'react';
 import Styled from 'styled-components';
 import Popup from "reactjs-popup";
 
-import HWE from '@pistoiahelm/react-hwe-editor';
+import { useHWE } from '@pistoiahelm/react-hwe-editor';
 
 const ExContainer = Styled.div`
     margin: auto;
-    width: 80%;
-    height: 600px; 
+    width: 95%;
+    height: 800px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 5px solid red;
 `;
 
 const App = () => {
+    var { editor, editorProps, viewer, getMolecularProps } = useHWE({'myHELMsettings':'settings'}, 'myInitialHELMSequence');
+    const HWE = editor();
+ 
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
-    const [hn, setHN] = useState('');
+    const [helm, setHELM] = useState('');
     const [mf, setMF] = useState('');
     const [mw, setMW] = useState('0');
     const [ec, setEC] = useState('0');
 
-    const myHelmSettings = {"url": "/myDBurl"}; // care for CORS
-
     // load hwe information into state vars
-    const setDisplay = (svg, hen, mof, mow, exc) => {
-      document.getElementById('canvas').innerHTML = svg;
-      setHN(hen);
-      setMF(mof);
-      setMW(mow);
-      setEC(exc);
-    }
-
-    // this is the callback that receives the HELM data we're interested in for our example app, we receive as JSON stringified object
-    const helmCallback = (data) => {
-      // data=[divContainingSVG, {'hn':helmNotation, 'mf':molecularFormula, ...}]
-      if (data) {         
-        var map = JSON.parse(data[1]);
-        setDisplay(data[0].innerHTML, map['hn'], map['mf'], map['mw'], map['ec']);
-      }
+    const setDisplay = () => {
+      document.getElementById('canvas').innerHTML = viewer(); // get viewer component
+      var molecularProps = getMolecularProps(); // get molecular properties
+      setHELM(molecularProps.helm);
+      setMF(molecularProps.mf);
+      setMW(molecularProps.mw);
+      setEC(molecularProps.ec);
     }
 
     return(
@@ -94,7 +90,7 @@ const App = () => {
           <table>
             <tbody>
               <tr>
-                <td>HELM Notation: {hn}</td>
+                <td>HELM Notation: {helm}</td>
               </tr>
               <tr>
                 <td>Molecular Formula: {mf}</td>
@@ -107,8 +103,8 @@ const App = () => {
               </tr>  
             </tbody>
           </table>
-          <Popup modal contentStyle={{width: "100%"}} trigger={<button>Open HWE</button>}>
-            <HWE customConfig={myHelmSettings} helmCallback={helmCallback} helmNotation={hn}/>
+          <Popup modal contentStyle={{width: "100%"}} trigger={<button>Open HWE</button>} onClose={setDisplay}>
+            <HWE {...editorProps}/>
           </Popup>
         </div>
     );

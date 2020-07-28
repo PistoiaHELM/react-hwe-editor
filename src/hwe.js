@@ -114,7 +114,7 @@ const extraSettings = () => {
  */
 const loadinitHELM = (initHELM, canvasId, helmCallback) => {
     const helmContent = document.getElementById('helm-content');   
-    const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point
+    const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point        
         helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML = initHELM;
         helmContent.querySelector('button[title="Apply HELM Notation"]').click();
         sendHelmInfo(canvasId, helmCallback)
@@ -146,7 +146,7 @@ const customHelmConfig = (customSettings, helmConfig) => {
  */
 const loadHWE = (customConfig) => {        
     var helmConfig = customHelmConfig(customConfig, helm_config);
-    window.org.helm.webeditor.Adapter.startApp('helm-content', helmConfig); // key line
+    window.org.helm.webeditor.Adapter.startApp('helm-content', helmConfig); // key line    
     // console.log('HWE react component entered at:', Date.now());
 }
 
@@ -193,7 +193,7 @@ const observCanvas = (elem, canvasId, helmCallback) => {
  *   initHELM: input helm notation to be rendered/analyzed by HWE
  *   customConfig: custom configuration settings for HWE
  */ 
-const HWE = (props) => {               
+export const HWE = (props) => {               
     // the id of the canvas div changes, so we have to update each time the component is mounted
     const canvasId = useRef(window.scil ? window.scil.JSDraw2.Editor._id + 1 : 1);
 
@@ -204,8 +204,7 @@ const HWE = (props) => {
             loadHWEDeps().then(() => {    
                 extraSettings();                              
                 loadHWE(props.customConfig);
-                if (props.initHELM) { loadinitHELM(props.initHELM, canvasId.current, props.helmCallback); }
-            
+                if (props.initHELM) { loadinitHELM(props.initHELM, canvasId.current, props.helmCallback); }       
             }).catch((error) => {
                 console.log('Error loading HWE: ', error);
             });
