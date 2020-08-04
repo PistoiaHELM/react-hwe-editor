@@ -22,16 +22,18 @@ The HELM Web Editor react (HWE) is a react based implementation of HELM. The web
 ## Install
 
 ```bash
-npm install --save postscribe
 npm install --save styled-components
 npm install --save @pistoiahelm/react-hwe-editor --registry=https://npm.pkg.github.com
 npm audit fix
 ```
 
-# Important Notes #
+# useHWE #
 The useHWE react hook has several parameters to note (example usage below): 
  *   customConfig: custom configuration settings for HWE  
  *   initHelm: input helm notation to be rendered/analyzed by HWE
+
+The following is an in-depth description of the inputs and outputs for the useHWE hook:
+ *    
  
 
 [![NPM](https://img.shields.io/npm/v/react-hwe-editor.svg)](https://www.npmjs.com/package/react-hwe-editor) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)

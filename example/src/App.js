@@ -2,24 +2,16 @@
  * Basic example react App using HWE react component
  */
 import React, {useState} from 'react';
-import Styled from 'styled-components';
 import Popup from "reactjs-popup";
 
 import { useHWE } from 'react-hwe-editor';
 
-const ExContainer = Styled.div`
-    margin: auto;
-    width: 95%;
-    height: 800px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 5px solid red;
-`;
-
 const App = () => {
-    var { editor, editorProps, viewer, getMolecularProps } = useHWE({},'a');
+    var { editor, editorProps, viewer, viewerProps, getMolecularProps } = useHWE('a');
     const HWE = editor();
+    const Viewer = viewer();
+
+    const [popupState, setPopupState] = useState(false);
  
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
     const [helm, setHELM] = useState('');
@@ -29,17 +21,24 @@ const App = () => {
 
     // load hwe information into state vars
     const setDisplay = () => {
-      document.getElementById('canvas').innerHTML = viewer().innerHTML;
-      var molecularProps = getMolecularProps();
-      setHELM(molecularProps.helm);
-      setMF(molecularProps.mf);
-      setMW(molecularProps.mw);
-      setEC(molecularProps.ec);
+      // var molecularProps = getMolecularProps();
+      // setHELM(molecularProps.helm);
+      // setMF(molecularProps.mf);
+      // setMW(molecularProps.mw);
+      // setEC(molecularProps.ec);
+      setPopupState(false)
+    }
+
+    const handlePopupClick = (e) => {
+      setPopupState(true);
     }
 
     return(
         <div className='App'>  
-          <ExContainer id='canvas' />
+        <Viewer {...viewerProps} popup={handlePopupClick}/>
+          <Popup modal contentStyle={{width: "100%"}} open={popupState} onClose={setDisplay}>
+              <HWE {...editorProps}/>
+          </Popup>
           <table>
             <tbody>
               <tr>
@@ -56,9 +55,6 @@ const App = () => {
               </tr>  
             </tbody>
           </table>
-          <Popup modal contentStyle={{width: "100%"}} trigger={<button>Open HWE</button>} onClose={setDisplay}>
-              <HWE {...editorProps}/>
-          </Popup>
         </div>
     );
 }

@@ -1,20 +1,5 @@
-import { HWE } from './hwe';
-
-/**
- * sudo uuid generator
- * @function uuidv4
- * returns a sudo random uuid
- */
-const uuidv4 = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-}
-
-// variables that keep track of latest viewer and molecular properties
-var hweViewer;
-var hweMolProps = {};
+import { HWE, uuidv4 } from './hwe';
+import { Viewer } from './viewer'
 
 /**
  * useHWE hook
@@ -25,44 +10,48 @@ var hweMolProps = {};
  * @param {Object} customConfig - custom HWE configuration settings (optional)
  * @param {String} initHELM - initial HELM sequence (optional)
  */
-export const useHWE = (customConfig?: object, initHELM?: string) => {   
-    if (typeof customConfig == 'string') { initHELM = customConfig; }  // this way initHELM can provided without customConfig
-    else if ((customConfig && typeof customConfig !== 'object') || (initHELM && typeof initHELM !== 'string')) throw 'useHWE hook parameter type check failed';
-
-    var prevMW = 0; // for comparison reasons
-    const helmCallback = (data) => {        
-        var parsedMolProps = JSON.parse(data[1]);        
-        if (parsedMolProps.mw != prevMW) {
-            hweViewer = data[0];
-            prevMW = parsedMolProps.mw;
-            hweMolProps = parsedMolProps;
-        }
+export const useHWE = (initHELM?: string, customConfig?: object) => {    
+    const helmCallback = (data) => {  
+        var helmId = data['id'];        
+        var hweViewer = data['canvas'];        
+        var parseData = JSON.parse(data['molecularProps']);     
+        var hweMolProps = parseData;
     }
 
     const editorProps = {
         customConfig: (customConfig ? customConfig : {}),
         initHELM: initHELM,
-        helmCallback: helmCallback
+        helmCallback: helmCallback,
+        hidden: false
     }    
 
     const editor = () => {
         return HWE;
     }
 
+    const viewerCallback = (data) => {
+        console.log(data.canvas);
+    }
+
+    const viewerProps = {
+        customConfig: (customConfig ? customConfig : {}),
+        helmNotation: initHELM,
+        viewerCallback: viewerCallback
+    } 
+
     const viewer = () => {
-        var clone = hweViewer.cloneNode(true);
-        clone.id = uuidv4();        
-        return clone;
+        return Viewer;
     }
 
     const getMolecularProps = () => {
-        return hweMolProps;
+        // return hweMolProps;
     }
     
     return {
         editor,
         editorProps,
         viewer,
+        viewerProps,
         getMolecularProps
     }
 }
