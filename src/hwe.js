@@ -14,6 +14,12 @@ const HELMContent = Styled.div`
     margin-top: 15px;
 `;
 
+const HiddenHELMContent = Styled(HELMContent)`
+    visibility: hidden; 
+    width:0;
+    height:0; 
+`;
+
 /**
  * style to hide HWE
  * @Object hiddenStyle
@@ -57,16 +63,17 @@ var helm_config = {
 }
 
 /** 
- * HELM Web Editor React Component
+ * HELM Web Editor React Component (HWE)
  * @function HWEComponent
  * returns Helm Web Editor as a react component 
  * @param props:
  *   initHELM: input helm notation to be rendered/analyzed by HWE
  *   customConfig: custom configuration settings for HWE
+ *   helmCallback: helm callback function, passes helm notation
+ *   hidden: hides the editor
  */ 
-export const HWE = (props) => {     
+export const HWE = (props) => {         
     const _id = uuidv4(); // component id
-    const canvasId = useRef(1); // JSDraw canvas div id
     const trackObserver = useRef(); // canvas update observer
 
     /**
@@ -89,14 +96,10 @@ export const HWE = (props) => {
     /**
      * Get molecular properties and helm notation
      * @function getMapJSON
-     * returns the molecular properties and helm notation of canvas molecule as JSON stringified object
+     * returns the molecular properties and helm notation of canvas chemical(s) as JSON stringified object
      * @param {HTML element} helmContent 
      */
-    const getMapJSON = (helmContent) => {
-        // helm notation sequence   
-        helmContent.querySelector('td[key="notation"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0].click();
-        var initHELM = helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML;                                                               
-
+    const getMapJSON = (helmContent) => {                                                         
         // render/ensure proper molecular properties
         helmContent.querySelector('td[key="properties"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0].click();
         var mfRaw = helmContent.querySelector('div[key="mf"]').innerHTML;
@@ -106,32 +109,45 @@ export const HWE = (props) => {
 
         // assemble JSON object and stringify it
         return JSON.stringify({
-            'helm' : initHELM,
             'mf' : mf,
             'mw' : mw,
             'ec' : ec
         });
     }
 
+    /**
+     * Get HELM Notation
+     * @function getHELM
+     * returns the helm notation of the current canvas chemical(s)
+     * @param {HTML element} helmContent 
+     */
+    const getHELM = (helmContent) => {
+        // helm notation sequence   
+        helmContent.querySelector('td[key="notation"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0].click();
+        var helm = helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML;
+        if (helm) { helmContent.querySelector('button[title="Apply HELM Notation"]').click(); }
+        return helm;
+    }
     /** 
      * Send HELM information to parent callback
      * @function sendHelmInfo
      * passes up the svg image div and JSON stringified object containing
      * the helm notation, molecular formula, weight, and extinction coefficient
      * via helmCallback, which is passed in here from useHWE.ts
-     * @param {String} canvasId - id of the JSDraw canvas
      * @param {function} helmCallback - The HWE parent callback function
      */
-    const sendHelmInfo = ((canvasId, helmCallback) => {            
-        var helmContent = document.getElementById(_id);        
-        if (helmContent && helmContent.innerHTML) { 
+    const sendHelmInfo = ((callback) => {            
+        var helmContent = document.getElementById(_id);      
+        if (helmContent && helmContent.innerHTML) {             
             var currentTab = getCurrentTab(helmContent);
+            var helm = getHELM(helmContent);                    
+            var canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
             var mapJSON = getMapJSON(helmContent);
-            var canvas = helmContent.querySelector('div[id=__JSDraw_' + canvasId + ']').childNodes[0].cloneNode(true);  
-            currentTab.click();
+            currentTab.click();            
             // return desired data through callback
-            helmCallback({
+            callback({
                 id: _id,
+                helm: helm,
                 canvas: canvas,
                 molecularProps: mapJSON
             });
@@ -177,7 +193,6 @@ export const HWE = (props) => {
         extraSettings();                                  
         var helmConfig = customHelmConfig(customConfig, helm_config);
         window.org.helm.webeditor.Adapter.startApp(_id, helmConfig); // key line    
-        // console.log('HWE react component entered at:', Date.now());
     }
 
     /** 
@@ -186,15 +201,14 @@ export const HWE = (props) => {
      * loads information from initHELM into HWE react component and renders it in canvas
      * attaches a listener to the canvas to listen for updates
      * @param {String} initHELM - The HELM Notation string
-     * @param {String} canvasId - The id of the JSDraw canvas
      * @param {function} helmCallback - The HWE parent callback function
      */
-    const loadinitHELM = (initHELM, canvasId, helmCallback) => {        
+    const loadinitHELM = (initHELM, callback) => {        
         const helmContent = document.getElementById(_id);   
         const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point        
             helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML = initHELM;
             helmContent.querySelector('button[title="Apply HELM Notation"]').click();
-            sendHelmInfo(canvasId, helmCallback)
+            sendHelmInfo(callback);
             observ.disconnect(); // disconnect after helm is loaded
         });
         observer.observe(helmContent, { // detects any changes to childNodes
@@ -209,12 +223,12 @@ export const HWE = (props) => {
      * @param {String} canvasId - The id of the JSDraw canvas
      * @param {function} helmCallback - The HWE parent callback function
      */
-    const observeChildrenHelp = (parent, helmCallback) => {
+    const observeCanvas = (parent, helmCallback) => {
         const observer = new MutationObserver((_mutations, observ) => {                        
             if (!trackObserver.current || (observ !== trackObserver.current)) {
                 trackObserver.current = observ;
             }
-            sendHelmInfo(canvasId.current, helmCallback);                        
+            sendHelmInfo(helmCallback);                        
         });
         observer.observe(parent, { // detects any changes to the canvas
             attributes: true,
@@ -227,13 +241,12 @@ export const HWE = (props) => {
      * attaches a mutation observer to the canvas to detect changes (does not detect initHELM)
      * see observeChildrenHelp
      * @param {HTML element} parent - parent HTML element
-     * @param {String} canvasId - The id of the JSDraw canvas
      * @param {function} helmCallback - The HWE parent callback function
      */
-    const observeChildren = (parent, helmCallback) => {   
+    const startRealTimeObservation = (parent, helmCallback) => {   
         const observer = new MutationObserver((_mutations, observ) => {
-            var canvasDiv = parent.querySelector('div[id=__JSDraw_' + canvasId.current + ']');
-            observeChildrenHelp(canvasDiv, helmCallback);        
+            var canvasDiv = parent.getElementsByTagName('svg')[0].parentNode;
+            observeCanvas(canvasDiv, helmCallback);        
             observ.disconnect();
         });
         observer.observe(parent, { // detect when helm loads in
@@ -241,14 +254,28 @@ export const HWE = (props) => {
         });
     }
 
+    /**
+     * Check for an initial HELM sequence
+     * @function checkForInitHelm
+     * Checks for an initial HELM sequence and uses the provided associated callback for that sequence
+     * (defaults to props.helmCallback unless props.initialCallback is provided)
+     * @param {String} initHELM 
+     * @param {function} callback 
+     */
+    const checkForInitHelm = (initHELM, callback) => {
+        if (initHELM) { 
+            loadinitHELM(initHELM, callback); 
+         } 
+    }
+
     useEffect(() => {         
-        observeChildren(document.getElementById(_id), props.helmCallback); // keep track of canvas changes in real time
+        if (props.rtObservation) { startRealTimeObservation(document.getElementById(_id), props.helmCallback); }
         loadHWEDeps().then(() => {
-            loadHWE(props.customConfig);      
-            canvasId.current = (window.JSDraw2.Editor._id ? window.JSDraw2.Editor._id + 1 : 1);         
-            if (props.initHELM) { loadinitHELM(props.initHELM, canvasId.current, props.helmCallback); }   
+            loadHWE(props.customConfig);                  
+            (props.initialCallback ? checkForInitHelm(props.initHELM, props.initialCallback) : checkForInitHelm(props.initHELM, props.helmCallback));
         });
-        return () => {
+        return () => {                             
+            sendHelmInfo(props.helmCallback);           
             if (trackObserver.current) { trackObserver.current.disconnect(); }
             window.scil.disconnectAll();
         }
@@ -257,7 +284,7 @@ export const HWE = (props) => {
 
     return( 
         <FullSizeDiv>
-            {props.hidden ? <HELMContent style={hiddenStyle} id={_id} /> : <HELMContent id={_id} /> }
+            {props.hidden ? <HiddenHELMContent id={_id} /> : <HELMContent id={_id} /> }
         </FullSizeDiv>
     );
 }

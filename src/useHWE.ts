@@ -1,4 +1,4 @@
-import { HWE, uuidv4 } from './hwe';
+import { HWE } from './hwe';
 import { Viewer } from './viewer'
 
 /**
@@ -10,18 +10,18 @@ import { Viewer } from './viewer'
  * @param {Object} customConfig - custom HWE configuration settings (optional)
  * @param {String} initHELM - initial HELM sequence (optional)
  */
-export const useHWE = (initHELM?: string, customConfig?: object) => {    
+export const useHWE = (initHELM?: string, customConfig?: object) => {  
+    initHELM = initHELM ? initHELM : '';
+    customConfig = customConfig ? customConfig : {};
+    
     const helmCallback = (data) => {  
-        var helmId = data['id'];        
-        var hweViewer = data['canvas'];        
-        var parseData = JSON.parse(data['molecularProps']);     
-        var hweMolProps = parseData;
     }
 
     const editorProps = {
-        customConfig: (customConfig ? customConfig : {}),
+        customConfig: customConfig,
         initHELM: initHELM,
         helmCallback: helmCallback,
+        rtObservation: false,
         hidden: false
     }    
 
@@ -29,29 +29,19 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
         return HWE;
     }
 
-    const viewerCallback = (data) => {
-        console.log(data.canvas);
-    }
-
     const viewerProps = {
-        customConfig: (customConfig ? customConfig : {}),
+        customConfig: customConfig,
         helmNotation: initHELM,
-        viewerCallback: viewerCallback
     } 
 
     const viewer = () => {
         return Viewer;
-    }
-
-    const getMolecularProps = () => {
-        // return hweMolProps;
     }
     
     return {
         editor,
         editorProps,
         viewer,
-        viewerProps,
-        getMolecularProps
+        viewerProps
     }
 }

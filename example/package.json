@@ -14,8 +14,7 @@
     "react-dom": "file:../node_modules/react-dom",
     "react-hwe-editor": "file:..",
     "react-scripts": "file:../node_modules/react-scripts",
-    "styled-components": "file:../node_modules/styled-components",
-    "reactjs-popup": "^1.5.0"
+    "styled-components": "file:../node_modules/styled-components"
   },
   "devDependencies": {
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
