@@ -11,8 +11,7 @@ const App = () => {
 
     return(
         <div className='App'>  
-            {/* <Viewer {...viewerProps}/> */}
-            <HWE {...editorProps} />
+            <Viewer {...viewerProps}/>
         </div>
     );
 }

@@ -51,64 +51,17 @@ If you want to use the default urls for monomer dbs, include a proxy to http://w
 /**
  * Basic example react App using HWE react component
  */
-import React, {useState} from 'react';
-import Styled from 'styled-components';
-import Popup from "reactjs-popup";
-
-import { useHWE } from '@pistoiahelm/react-hwe-editor';
-
-const ExContainer = Styled.div`
-    margin: auto;
-    width: 95%;
-    height: 800px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 5px solid red;
-`;
+import React from 'react';
+import { useHWE } from 'react-hwe-editor';
 
 const App = () => {
-    var { editor, editorProps, viewer, getMolecularProps } = useHWE({'myHELMsettings':'settings'}, 'myInitialHELMSequence');
+    var { editor, editorProps, viewer, viewerProps } = useHWE();
     const HWE = editor();
- 
-    // stores helm notation, molecular formulas, molecular weights, extinction coefficients
-    const [helm, setHELM] = useState('');
-    const [mf, setMF] = useState('');
-    const [mw, setMW] = useState('0');
-    const [ec, setEC] = useState('0');
-
-    // load hwe information into state vars
-    const setDisplay = () => {
-      document.getElementById('canvas').innerHTML = viewer(); // get viewer component
-      var molecularProps = getMolecularProps(); // get molecular properties
-      setHELM(molecularProps.helm);
-      setMF(molecularProps.mf);
-      setMW(molecularProps.mw);
-      setEC(molecularProps.ec);
-    }
+    const Viewer = viewer();
 
     return(
         <div className='App'>  
-          <ExContainer id='canvas' />
-          <table>
-            <tbody>
-              <tr>
-                <td>HELM Notation: {helm}</td>
-              </tr>
-              <tr>
-                <td>Molecular Formula: {mf}</td>
-              </tr>
-              <tr>
-                <td>Molecular Weight: {mw}</td>
-              </tr>
-              <tr>
-                <td>Extinction Coefficient: {ec}</td>
-              </tr>  
-            </tbody>
-          </table>
-          <Popup modal contentStyle={{width: "100%"}} trigger={<button>Open HWE</button>} onClose={setDisplay}>
-            <HWE {...editorProps}/>
-          </Popup>
+            <Viewer {...viewerProps}/>
         </div>
     );
 }
