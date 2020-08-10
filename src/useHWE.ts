@@ -14,30 +14,52 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
     initHELM = initHELM ? initHELM : '';
     customConfig = customConfig ? customConfig : {};
     
+    /**
+     * HELM Web Editor Callback function
+     * @function helmCallback
+     * gives the user a place to use editor data
+     * @param {Object} data 
+     */
     const helmCallback = (data) => {  
     }
 
+    /**
+     * HELM Web Editor Viewer Callback function
+     * @function viewerCallback
+     * gives the user a place to use viewer data
+     * @param {Object} data 
+     */
+    const viewerCallback = (data) => {
+    }
+
+    // default editor props
     const editorProps = {
-        customConfig: customConfig,
         initHELM: initHELM,
+        customConfig: customConfig,
         helmCallback: helmCallback,
         rtObservation: false,
-        hidden: false
+        hidden: false,
+        style: {}
     }    
 
     const editor = () => {
         return HWE;
     }
 
+    // default viewer props
     const viewerProps = {
         customConfig: customConfig,
         helmNotation: initHELM,
+        viewerCallback: viewerCallback,
+        displayMolecularProperties: true,
+        style: {},
+        tableStyle: {}
     } 
 
     const viewer = () => {
         return Viewer;
     }
-    
+
     return {
         editor,
         editorProps,

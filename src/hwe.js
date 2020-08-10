@@ -3,6 +3,7 @@ import Styled from 'styled-components';
 import loadHWEDeps from '@pistoiahelm/react-hwe-deps' // custom npm repo
 
 export const FullSizeDiv = Styled.div`
+    height: 100%;
     font-family:Arial; 
     background-color: white;
     font-size: 15px;
@@ -31,7 +32,7 @@ const hiddenStyle = {
 }
 
 /**
- * sudo uuid generator
+ * pseudo uuid generator
  * @function uuidv4
  * returns a sudo random uuid
  */
@@ -65,12 +66,14 @@ var helm_config = {
 /** 
  * HELM Web Editor React Component (HWE)
  * @function HWEComponent
- * returns Helm Web Editor as a react component 
- * @param props:
+ * returns HWE as a react component 
+ * @param {Object} props:
  *   initHELM: input helm notation to be rendered/analyzed by HWE
  *   customConfig: custom configuration settings for HWE
- *   helmCallback: helm callback function, passes helm notation
+ *   helmCallback: helm callback function, passes hwe data
+ *   rtObservation: flag for real time observation to the editor
  *   hidden: hides the editor
+ *   style: style for HWE
  */ 
 export const HWE = (props) => {         
     const _id = uuidv4(); // component id
@@ -146,7 +149,7 @@ export const HWE = (props) => {
             currentTab.click();            
             // return desired data through callback
             callback({
-                id: _id,
+                editor_id: _id,
                 helm: helm,
                 canvas: canvas,
                 molecularProps: mapJSON
@@ -184,7 +187,7 @@ export const HWE = (props) => {
     }
 
     /**
-     * Load HELM Web Editor into document
+     * Load HWE into document
      * @function loadHWE
      * 
      * @param {Object} customConfig
@@ -283,7 +286,7 @@ export const HWE = (props) => {
     }, []);
 
     return( 
-        <FullSizeDiv>
+        <FullSizeDiv style={props.style}>
             {props.hidden ? <HiddenHELMContent id={_id} /> : <HELMContent id={_id} /> }
         </FullSizeDiv>
     );

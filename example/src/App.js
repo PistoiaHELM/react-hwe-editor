@@ -5,9 +5,11 @@ import React from 'react';
 import { useHWE } from 'react-hwe-editor';
 
 const App = () => {
-    var { editor, editorProps, viewer, viewerProps } = useHWE();
+    var { editor, editorProps, viewer, viewerProps } = useHWE('a');
     const HWE = editor();
     const Viewer = viewer();
+
+
 
     return(
         <div className='App'>  
