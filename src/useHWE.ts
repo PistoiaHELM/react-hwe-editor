@@ -1,4 +1,4 @@
-import { HWE } from './hwe';
+import Editor from './hwe';
 import { Viewer } from './viewer'
 
 /**
@@ -36,34 +36,30 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
     const editorProps = {
         initHELM: initHELM,
         customConfig: customConfig,
+        initialCallback: undefined,
         helmCallback: helmCallback,
         rtObservation: false,
         hidden: false,
         style: {}
     }    
 
-    const editor = () => {
-        return HWE;
-    }
 
     // default viewer props
     const viewerProps = {
+        initHELM: initHELM,
         customConfig: customConfig,
-        helmNotation: initHELM,
         viewerCallback: viewerCallback,
         displayMolecularProperties: true,
         style: {},
-        tableStyle: {}
+        tableStyle: {},
+        tableBorder: 1
     } 
 
-    const viewer = () => {
-        return Viewer;
-    }
 
     return {
-        editor,
+        Editor,
         editorProps,
-        viewer,
+        Viewer,
         viewerProps
     }
 }

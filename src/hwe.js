@@ -22,16 +22,6 @@ const HiddenHELMContent = Styled(HELMContent)`
 `;
 
 /**
- * style to hide HWE
- * @Object hiddenStyle
- */
-const hiddenStyle = {
-    visibility: 'hidden', 
-    width:0, 
-    height:0, 
-}
-
-/**
  * pseudo uuid generator
  * @function uuidv4
  * returns a sudo random uuid
@@ -43,26 +33,6 @@ export const uuidv4 = () => {
     });
 }
 
-// default configuration for HWE
-var helm_config = {
-    showabout: false,
-    ambiguity: true,
-    mexfontsize: "90%",
-    mexrnapinontab: true, 
-    topmargin: 20,
-    mexmonomerstab: true,
-    sequenceviewonly: false,
-    mexfavoritefirst: true,
-    mexfilter: true,
-    url: "/HELM2MonomerService/rest", 
-    calculatorurl: null, // web service to calculate structure properties
-    cleanupurl: null,
-    monomercleanupurl: "/WebService/service/Conversion/Molfile", // web service to clean up structures
-    validateurl: "/WebService/service/Validation", // web service to clean up structures
-    toolbarholder: "toolbar",
-    toolbarbuttons: [{ icon: "canvas-1.png", label: "Canvas" }, { icon: "monomers-2.png", label: "Monomer Library", url: "MonomerLibApp.htm" }, { icon: "settings-2.png", label: "Ruleset", url: "RuleSetApp.htm"}]
-}
-
 /** 
  * HELM Web Editor React Component (HWE)
  * @function HWEComponent
@@ -70,14 +40,35 @@ var helm_config = {
  * @param {Object} props:
  *   initHELM: input helm notation to be rendered/analyzed by HWE
  *   customConfig: custom configuration settings for HWE
+ *   initialCallback: separate callback function for loadinitHELM if desired (optional)
  *   helmCallback: helm callback function, passes hwe data
  *   rtObservation: flag for real time observation to the editor
  *   hidden: hides the editor
  *   style: style for HWE
  */ 
-export const HWE = (props) => {         
+const HWE = (props) => {                 
     const _id = uuidv4(); // component id
     const trackObserver = useRef(); // canvas update observer
+
+    // default configuration for HWE
+    var defaultConfig = {
+        showabout: false,
+        ambiguity: true,
+        mexfontsize: "90%",
+        mexrnapinontab: true, 
+        topmargin: 20,
+        mexmonomerstab: true,
+        sequenceviewonly: false,
+        mexfavoritefirst: true,
+        mexfilter: true,
+        url: "/HELM2MonomerService/rest", 
+        calculatorurl: null, // web service to calculate structure properties
+        cleanupurl: null,
+        monomercleanupurl: "/WebService/service/Conversion/Molfile", // web service to clean up structures
+        validateurl: "/WebService/service/Validation", // web service to clean up structures
+        toolbarholder: "toolbar",
+        toolbarbuttons: [{ icon: "canvas-1.png", label: "Canvas" }, { icon: "monomers-2.png", label: "Monomer Library", url: "MonomerLibApp.htm" }, { icon: "settings-2.png", label: "Ruleset", url: "RuleSetApp.htm"}]
+    }
 
     /**
      * Get current editor tab
@@ -131,6 +122,7 @@ export const HWE = (props) => {
         if (helm) { helmContent.querySelector('button[title="Apply HELM Notation"]').click(); }
         return helm;
     }
+
     /** 
      * Send HELM information to parent callback
      * @function sendHelmInfo
@@ -139,7 +131,7 @@ export const HWE = (props) => {
      * via helmCallback, which is passed in here from useHWE.ts
      * @param {function} helmCallback - The HWE parent callback function
      */
-    const sendHelmInfo = ((callback) => {            
+    const sendHelmInfo = ((callback) => {
         var helmContent = document.getElementById(_id);      
         if (helmContent && helmContent.innerHTML) {             
             var currentTab = getCurrentTab(helmContent);
@@ -194,8 +186,8 @@ export const HWE = (props) => {
      */
     const loadHWE = (customConfig) => {    
         extraSettings();                                  
-        var helmConfig = customHelmConfig(customConfig, helm_config);
-        window.org.helm.webeditor.Adapter.startApp(_id, helmConfig); // key line    
+        var helmConfig = customHelmConfig(customConfig, defaultConfig);
+        window.org.helm.webeditor.Adapter.startApp(_id, helmConfig);
     }
 
     /** 
@@ -220,17 +212,15 @@ export const HWE = (props) => {
     }
 
     /**
-     * Observe changes to canvas helper
-     * @function observeChildrenHelp
-     * 
+     * Observe changes to canvas
+     * @function observeCanvas
+     * observes real time changes to the HWE canvas
      * @param {String} canvasId - The id of the JSDraw canvas
      * @param {function} helmCallback - The HWE parent callback function
      */
     const observeCanvas = (parent, helmCallback) => {
         const observer = new MutationObserver((_mutations, observ) => {                        
-            if (!trackObserver.current || (observ !== trackObserver.current)) {
-                trackObserver.current = observ;
-            }
+            if (!trackObserver.current || (observ !== trackObserver.current)) { trackObserver.current = observ; }
             sendHelmInfo(helmCallback);                        
         });
         observer.observe(parent, { // detects any changes to the canvas
@@ -239,10 +229,10 @@ export const HWE = (props) => {
     }
 
     /**
-     * Observe changes to canvas 
-     * @function observeChildren
-     * attaches a mutation observer to the canvas to detect changes (does not detect initHELM)
-     * see observeChildrenHelp
+     * Observe changes to a node 
+     * @function startRealTimeObservation
+     * attaches a mutation observer to the specified node 
+     * to detect changes see usage at observeCanvas
      * @param {HTML element} parent - parent HTML element
      * @param {function} helmCallback - The HWE parent callback function
      */
@@ -270,20 +260,19 @@ export const HWE = (props) => {
             loadinitHELM(initHELM, callback); 
          } 
     }
-
-    useEffect(() => {         
-        if (props.rtObservation) { startRealTimeObservation(document.getElementById(_id), props.helmCallback); }
+    
+    useEffect(() => {                         
+        if (props.rtObservation) { startRealTimeObservation(document.getElementById(_id), props.helmCallback); }        
         loadHWEDeps().then(() => {
             loadHWE(props.customConfig);                  
             (props.initialCallback ? checkForInitHelm(props.initHELM, props.initialCallback) : checkForInitHelm(props.initHELM, props.helmCallback));
         });
-        return () => {                             
+        return () => {            
             sendHelmInfo(props.helmCallback);           
             if (trackObserver.current) { trackObserver.current.disconnect(); }
             window.scil.disconnectAll();
         }
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [props]);
 
     return( 
         <FullSizeDiv style={props.style}>
@@ -293,3 +282,4 @@ export const HWE = (props) => {
 }
 
 
+export default HWE;
