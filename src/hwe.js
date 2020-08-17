@@ -51,24 +51,24 @@ export const uuidv4 = () => {
 const HWE = (props) => {                     
     const _id = uuidv4(); // component id
     const trackObserver = useRef(); // canvas update observer
-    const defaultConfig = { // default configuration for HWE
+    const defaultConfig = {
         showabout: false,
         ambiguity: true,
-        mexfontsize: "90%",
+        mexfontsize: '90%',
         mexrnapinontab: true, 
         topmargin: 20,
         mexmonomerstab: true,
         sequenceviewonly: false,
         mexfavoritefirst: true,
         mexfilter: true,
-        url: "/HELM2MonomerService/rest", 
-        calculatorurl: null, // web service to calculate structure properties
+        url: '/HELM2MonomerService/rest', 
+        calculatorurl: null, 
         cleanupurl: null,
-        monomercleanupurl: "/WebService/service/Conversion/Molfile", // web service to clean up structures
-        validateurl: "/WebService/service/Validation", // web service to clean up structures
-        toolbarholder: "toolbar",
-        toolbarbuttons: [{ icon: "canvas-1.png", label: "Canvas" }, { icon: "monomers-2.png", label: "Monomer Library", url: "MonomerLibApp.htm" }, { icon: "settings-2.png", label: "Ruleset", url: "RuleSetApp.htm"}]
-    }
+        monomercleanupurl: '/WebService/service/Conversion/Molfile', 
+        validateurl: '/WebService/service/Validation', 
+        toolbarholder: 'toolbar',
+        toolbarbuttons: [{ icon: 'canvas-1.png', label: 'Canvas' }, { icon: 'monomers-2.png', label: 'Monomer Library', url: 'MonomerLibApp.htm' }, { icon: 'settings-2.png', label: 'Ruleset', url: 'RuleSetApp.htm'}]
+      }
 
     /**
      * Get current editor tab

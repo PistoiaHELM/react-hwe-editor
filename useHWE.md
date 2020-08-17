@@ -34,20 +34,20 @@ const { Editor, editorProps } = useHWE(myInitHELM);
 defaultConfig = {
   showabout: false,
   ambiguity: true,
-  mexfontsize: "90%",
+  mexfontsize: '90%',
   mexrnapinontab: true, 
   topmargin: 20,
   mexmonomerstab: true,
   sequenceviewonly: false,
   mexfavoritefirst: true,
   mexfilter: true,
-  url: "/HELM2MonomerService/rest", 
+  url: '/HELM2MonomerService/rest', 
   calculatorurl: null, 
   cleanupurl: null,
-  monomercleanupurl: "/WebService/service/Conversion/Molfile", 
-  validateurl: "/WebService/service/Validation", 
-  toolbarholder: "toolbar",
-  toolbarbuttons: [{ icon: "canvas-1.png", label: "Canvas" }, { icon: "monomers-2.png", label: "Monomer Library", url: "MonomerLibApp.htm" }, { icon: "settings-2.png", label: "Ruleset", url: "RuleSetApp.htm"}]
+  monomercleanupurl: '/WebService/service/Conversion/Molfile', 
+  validateurl: '/WebService/service/Validation', 
+  toolbarholder: 'toolbar',
+  toolbarbuttons: [{ icon: 'canvas-1.png', label: 'Canvas' }, { icon: 'monomers-2.png', label: 'Monomer Library', url: 'MonomerLibApp.htm' }, { icon: 'settings-2.png', label: 'Ruleset', url: 'RuleSetApp.htm'}]
 }
 ```
 
@@ -185,7 +185,7 @@ const App = () => {
 const App = () => {
   const { Editor, editorProps } = useHWE();
 
-  editorProps.style = {padding: "5px"}; // renders Editor with custom styling
+  editorProps.style = {padding: '5px'}; // renders Editor with custom styling
 }
 ```
 
@@ -287,7 +287,7 @@ const App = () => {
 const App = () => {
   const { Viewer, viewerProps } = useHWE();
 
-  viewerProps.style = { padding: "5px" };
+  viewerProps.style = { padding: '5px' };
   // the Viewer table will load with custom styling
 }
 ```
@@ -300,3 +300,125 @@ const App = () => {
   // the Viewer table will render with a border
 }
 ```
+
+# **Example useHWE Usage**
+
+### Example 1: Basic Editor App
+```jsx
+/**
+ * Basic example react App using Editor react component
+ */
+import React from 'react';
+import { useHWE } from 'react-hwe-editor';
+
+const App = () => {
+    const { Editor, editorProps } = useHWE('helm', { topmargin: '30px' });
+
+    return(
+        <div className='App'>  
+            <h1>Welcome to my HELM Web Editor App!</h1>
+            <Editor {...editorProps}/>
+        </div>
+    );
+}
+
+export default App;
+``` 
+
+### Example 2: Basic Viewer App
+```jsx
+/**
+ * Basic example react App using Viewer react component
+ */
+import React from 'react';
+import { useHWE } from 'react-hwe-editor';
+
+const App = () => {
+    const { Viewer, viewerProps } = useHWE('helm');
+
+    return(
+        <div className='App'>  
+            <h1>Welcome to my HELM Web Editor Viewer App!</h1>
+            <Viewer {...viewerProps}/>
+        </div>
+    );
+}
+
+export default App;
+``` 
+
+### Example 3: Custom Data Handling
+```jsx
+/**
+ * More complex usage case handling viewer data
+ */
+import React, { useState } from 'react';
+import { useHWE } from 'react-hwe-editor';
+
+const App = () => {
+    const { Viewer, viewerProps } = useHWE('helm');
+    const [myMW, setMyMW] = useState('');
+
+    // details about all viewerProps 
+    viewerProps.displayMolecularProperties = false;
+    viewerProps.viewerCallback = (data) => {
+        let molecularProps = data.molecularProps;
+        setMyMW(molecularProps.mw);
+    }
+
+    return(
+        <div className='App'>  
+            <h1>Welcome to my HELM Web Editor Viewer App!</h1>
+            <h4>Current Molecular Weight: {myMW} </h4>
+            <Viewer {...viewerProps}/>
+        </div>
+    );
+}
+``` 
+
+### Example 4: Multiple Viewers
+```jsx
+/**
+ * More complex usage case handling multiple viewers and callbacks
+ */
+import React, {useState} from 'react';
+import { useHWE } from 'react-hwe-editor';
+
+const App = () => {
+    const { Viewer, viewerProps } = useHWE('helm');
+
+    const [myHELM, setMyHELM] = useState();
+    const [myHELM2, setMyHELM2] = useState();
+    const [myMW, setMyMW] = useState();
+
+    const myCallback = (data)=> {
+        setMyHELM(data.helm)
+    }
+
+    const myCallback2 = (data)=> {
+        setMyHELM2(data.helm)
+    }
+
+    const myCallback3 = (data) => {
+        const molecularProps = data.molecularProps;
+        setMyMW(molecularProps.mw)
+    }
+
+    viewerProps.viewerCallback = myCallback;
+    const viewerProps2 = {...viewerProps, ...{viewerCallback: myCallback2, initHELM: 'helmhelm'}}
+    const viewerProps3 = {...viewerProps, ...{viewerCallback: myCallback3, initHELM: 'asdf'}}
+
+    return(
+        <div className='App'>  
+            <h1>Welcome to my HELM Web Editor Viewer App!</h1>
+            <h4>Current HELM for viewer 1: {myHELM} </h4>
+            <h4>Current HELM for viewer 2: {myHELM2} </h4>
+            <h4>Current molecular weight for viewer 3: {myMW} </h4>
+            <Viewer {...viewerProps} />
+            <Viewer {...viewerProps2} />
+            <Viewer {...viewerProps3} />
+        </div>
+    );
+}
+export default App;
+``` 

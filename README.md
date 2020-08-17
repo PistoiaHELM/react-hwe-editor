@@ -51,7 +51,7 @@ If you want to use the default urls for monomer dbs, include a proxy to http://w
 ### Example 1: Basic Editor App
 ```jsx
 /**
- * Basic example react App using editor react component
+ * Basic example react App using Editor react component
  */
 import React from 'react';
 import { useHWE } from 'react-hwe-editor';
@@ -73,7 +73,7 @@ export default App;
 ### Example 2: Basic Viewer App
 ```jsx
 /**
- * Basic example react App using viewer react component
+ * Basic example react App using Viewer react component
  */
 import React from 'react';
 import { useHWE } from 'react-hwe-editor';
@@ -107,7 +107,7 @@ const App = () => {
     // details about all viewerProps 
     viewerProps.displayMolecularProperties = false;
     viewerProps.viewerCallback = (data) => {
-        let molecularProps = JSON.parse(data.molecularProps);
+        let molecularProps = data.molecularProps;
         setMyMW(molecularProps.mw);
     }
 
@@ -145,7 +145,7 @@ const App = () => {
     }
 
     const myCallback3 = (data) => {
-        const molecularProps = JSON.parse(data.molecularProps);
+        const molecularProps = data.molecularProps;
         setMyMW(molecularProps.mw)
     }
 
