@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import HWE, { uuidv4 } from './hwe';
 import Styled from 'styled-components';
-import Popup from "reactjs-popup";
+import Popup from 'reactjs-popup';
 
 const FullDiv = Styled.div`
     overflow: auto;
@@ -9,10 +9,12 @@ const FullDiv = Styled.div`
 
 // popup editor modal style
 const popUpStyle = {
-    width: "95%", 
-    height: "95%",
-    overflow: "auto"
+    width: '85%', 
+    height: '85%',
+    overflow: 'auto'
 }
+
+export const viewerClass = 'helmViewer';
 
 /**
  * HELM Web Editor Viewer Component
@@ -23,13 +25,12 @@ const popUpStyle = {
  *   customConfig: custom configuration settings for HWE
  *   viewerCallback: viewer callback function, passes viewer data
  *   displayMolecularProperties: flag for displaying molecular properties table
- *   style: style for viewer
- *   tableStyle: style for table containing canvas and molecular properties
- *   tableBorder: flag for table border
+ *   style: style for viewer table
+ *   border: flag for viewer table border
  */
-export const Viewer = (props) => {   
+export const Viewer = (props) => {       
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
-    const [helm, setHELM] = useState(props.initHELM);
+    const [helm, setHELM] = useState(props.initHELM);   // TODO MAKE NEW HELM VAR DIFFERENT FROM initHELM 
     const [mf, setMF] = useState('');
     const [mw, setMW] = useState('0');
     const [ec, setEC] = useState('0');
@@ -38,6 +39,11 @@ export const Viewer = (props) => {
     const [openHWE, setOpenHWE] = useState(Boolean(helm));
     const [popupState, setPopupState] = useState(false);
     const viewId = useRef(uuidv4());
+
+    // if (helm != props.initHELM) {
+    //     setHELM(props.initHELM);
+    //     setOpenHWE(true);
+    // }
 
     /**
      * callback to handle an initial helm sequence
@@ -55,10 +61,10 @@ export const Viewer = (props) => {
      * @param {Object} svg 
      */
     const cropSVG = (svg) => {
-        var bbox = svg.getBBox();
-        svg.setAttribute("width", bbox.width + 5 + "px");
-        svg.setAttribute("height", bbox.height + 5 + "px");
-        svg.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);     
+        let bbox = svg.getBBox();
+        svg.setAttribute('width', bbox.width + 5 + 'px');
+        svg.setAttribute('height', bbox.height + 5 + 'px');
+        svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);     
     }
 
     /**
@@ -69,15 +75,15 @@ export const Viewer = (props) => {
      */
     const viewerHelmCallback = (data) => {        
         data.view_id = viewId.current;
-        document.getElementById(viewId.current).innerHTML = data.canvas.outerHTML;
-        var molecularProps = JSON.parse(data.molecularProps);
-        cropSVG(document.getElementById(viewId.current).childNodes[0]);
+        let canvas = document.getElementById(viewId.current).getElementsByTagName('td')[0];
+        canvas.innerHTML = data.canvas.outerHTML;
+        cropSVG(canvas.childNodes[0]);
         setHELM(data.helm);
-        setMF(molecularProps.mf);
-        setMW(molecularProps.mw);
-        setEC(molecularProps.ec);
-        setPopupState(false);
-        props.viewerCallback(data);
+        setMF(data.molecularProps.mf);
+        setMW(data.molecularProps.mw);
+        setEC(data.molecularProps.ec);
+        setPopupState(false);        
+        if (props.viewerCallback) { props.viewerCallback(data); }
     }
 
     // HELM Web Editor Properties passed from Viewer
@@ -89,12 +95,11 @@ export const Viewer = (props) => {
     }
 
     return(
-        <FullDiv onDoubleClick={() => { setPopupState(true) }} style={props.style}>
-            {openHWE ? <HWE {...hwePropsFromViewer} /> : null}
-            <table border={props.tableBorder} cellPadding="5px" style={props.tableStyle}>
+        <FullDiv onDoubleClick={() => { setPopupState(true) }} id={viewId.current} className={viewerClass}>
+            <table border={props.tableBorder} cellPadding='5px' style={props.style}>
                 <tbody>
                     <tr>
-                        <td id={viewId.current} />
+                        <td />
                         <td hidden={!props.displayMolecularProperties}>
                             <table>
                                 <tbody>
@@ -113,6 +118,7 @@ export const Viewer = (props) => {
                     </tr>
                 </tbody>
             </table>
+            {openHWE ? <HWE {...hwePropsFromViewer} /> : null}
             <Popup modal contentStyle={popUpStyle} open={popupState} >
               <HWE {...hwePropsFromViewer}/>
             </Popup>

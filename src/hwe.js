@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import Styled from 'styled-components';
 import loadHWEDeps from '@pistoiahelm/react-hwe-deps' // custom npm repo
 
-export const FullSizeDiv = Styled.div`
+const FullSizeDiv = Styled.div`
     height: 100%;
     font-family:Arial; 
     background-color: white;
@@ -21,14 +21,16 @@ const HiddenHELMContent = Styled(HELMContent)`
     height:0; 
 `;
 
+export const editorClass = 'helmEditor';
+
 /**
  * pseudo uuid generator
  * @function uuidv4
  * returns a sudo random uuid
  */
 export const uuidv4 = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
 }
@@ -46,12 +48,10 @@ export const uuidv4 = () => {
  *   hidden: hides the editor
  *   style: style for HWE
  */ 
-const HWE = (props) => {                 
+const HWE = (props) => {                     
     const _id = uuidv4(); // component id
     const trackObserver = useRef(); // canvas update observer
-
-    // default configuration for HWE
-    var defaultConfig = {
+    const defaultConfig = { // default configuration for HWE
         showabout: false,
         ambiguity: true,
         mexfontsize: "90%",
@@ -77,13 +77,13 @@ const HWE = (props) => {
      * @param {HTML element} helmContent 
      */
     const getCurrentTab = (helmContent) => {
-        var allTabs = helmContent.querySelector('td[key="notation"]').parentNode.childNodes;
-        var map = {};
+        let allTabs = helmContent.querySelector('td[key="notation"]').parentNode.childNodes;
+        let map = {};
         for (const [i, elem] of allTabs.entries()) {
-            var curColor = elem.style.backgroundColor;
+            let curColor = elem.style.backgroundColor;
             map[curColor] = (map[curColor] ? map[curColor] + i : i);
         };     
-        var min = Math.min(...Object.values(map))
+        let min = Math.min(...Object.values(map))
         return allTabs[min].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
     }
 
@@ -96,17 +96,16 @@ const HWE = (props) => {
     const getMapJSON = (helmContent) => {                                                         
         // render/ensure proper molecular properties
         helmContent.querySelector('td[key="properties"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0].click();
-        var mfRaw = helmContent.querySelector('div[key="mf"]').innerHTML;
-        var mf = mfRaw.replace(/<\/*sub>/g, ''); // remove all sub tags to isolate formula
-        var mw = helmContent.querySelector('div[key="mw"]').innerHTML;
-        var ec = helmContent.querySelector('div[key="ec"]').innerHTML;
+        let mf = helmContent.querySelector('div[key="mf"]').innerText;
+        let mw = helmContent.querySelector('div[key="mw"]').innerText;
+        let ec = helmContent.querySelector('div[key="ec"]').innerText;
 
         // assemble JSON object and stringify it
-        return JSON.stringify({
+        return {
             'mf' : mf,
             'mw' : mw,
             'ec' : ec
-        });
+        };
     }
 
     /**
@@ -118,7 +117,7 @@ const HWE = (props) => {
     const getHELM = (helmContent) => {
         // helm notation sequence   
         helmContent.querySelector('td[key="notation"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0].click();
-        var helm = helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML;
+        let helm = helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerText;
         if (helm) { helmContent.querySelector('button[title="Apply HELM Notation"]').click(); }
         return helm;
     }
@@ -132,20 +131,22 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const sendHelmInfo = ((callback) => {
-        var helmContent = document.getElementById(_id);      
+        let helmContent = document.getElementById(_id);      
         if (helmContent && helmContent.innerHTML) {             
-            var currentTab = getCurrentTab(helmContent);
-            var helm = getHELM(helmContent);                    
-            var canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
-            var mapJSON = getMapJSON(helmContent);
+            let currentTab = getCurrentTab(helmContent);
+            let helm = getHELM(helmContent);                    
+            let canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
+            let mapJSON = getMapJSON(helmContent);            
             currentTab.click();            
             // return desired data through callback
-            callback({
-                editor_id: _id,
-                helm: helm,
-                canvas: canvas,
-                molecularProps: mapJSON
-            });
+            if (callback) { 
+                callback({
+                    editor_id: _id,
+                    helm: helm,
+                    canvas: canvas,
+                    molecularProps: mapJSON
+                });
+            }
         }
     });
 
@@ -186,7 +187,7 @@ const HWE = (props) => {
      */
     const loadHWE = (customConfig) => {    
         extraSettings();                                  
-        var helmConfig = customHelmConfig(customConfig, defaultConfig);
+        let helmConfig = customHelmConfig(customConfig, defaultConfig);
         window.org.helm.webeditor.Adapter.startApp(_id, helmConfig);
     }
 
@@ -199,7 +200,7 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const loadinitHELM = (initHELM, callback) => {        
-        const helmContent = document.getElementById(_id);   
+        const helmContent = document.getElementById(_id);           
         const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point        
             helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML = initHELM;
             helmContent.querySelector('button[title="Apply HELM Notation"]').click();
@@ -238,7 +239,7 @@ const HWE = (props) => {
      */
     const startRealTimeObservation = (parent, helmCallback) => {   
         const observer = new MutationObserver((_mutations, observ) => {
-            var canvasDiv = parent.getElementsByTagName('svg')[0].parentNode;
+            let canvasDiv = parent.getElementsByTagName('svg')[0].parentNode;
             observeCanvas(canvasDiv, helmCallback);        
             observ.disconnect();
         });
@@ -275,7 +276,7 @@ const HWE = (props) => {
     }, [props]);
 
     return( 
-        <FullSizeDiv style={props.style}>
+        <FullSizeDiv style={props.style} className={editorClass}>
             {props.hidden ? <HiddenHELMContent id={_id} /> : <HELMContent id={_id} /> }
         </FullSizeDiv>
     );

@@ -11,6 +11,10 @@ import { Viewer } from './viewer'
  * @param {String} initHELM - initial HELM sequence (optional)
  */
 export const useHWE = (initHELM?: string, customConfig?: object) => {  
+    if (typeof initHELM == 'object') { // allow customConfig to be provided without initHELM
+        customConfig = initHELM; 
+        initHELM = undefined; 
+    }    
     initHELM = initHELM ? initHELM : '';
     customConfig = customConfig ? customConfig : {};
     
@@ -20,8 +24,7 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
      * gives the user a place to use editor data
      * @param {Object} data 
      */
-    const helmCallback = (data) => {  
-    }
+    const helmCallback = (data) => {}
 
     /**
      * HELM Web Editor Viewer Callback function
@@ -29,8 +32,7 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
      * gives the user a place to use viewer data
      * @param {Object} data 
      */
-    const viewerCallback = (data) => {
-    }
+    const viewerCallback = (data) => {}
 
     // default editor props
     const editorProps = {

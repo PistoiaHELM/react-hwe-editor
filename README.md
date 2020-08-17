@@ -15,7 +15,7 @@ Email us at info@openHELM.org
 
 # HELM WebEditor 
 
-The HELM Web Editor react (HWE) is a react based implementation of HELM. The webeditor depends on a a set of services which have been split into modules for easier maintenance. The diagram below shows the relationship between the components. 
+The HELM Web Editor react (HWE) is a react based implementation of HELM. The webeditor depends on a set of services which have been split into modules for easier maintenance. The diagram below shows the relationship between the components. 
 
 ![](https://github.com/ClairePA/pistoiahelm.github.com/blob/master/images/ArchitectureOverview.png?raw=true)
 
@@ -107,7 +107,7 @@ const App = () => {
     // details about all viewerProps 
     viewerProps.displayMolecularProperties = false;
     viewerProps.viewerCallback = (data) => {
-        var molecularProps = JSON.parse(data.molecularProps);
+        let molecularProps = JSON.parse(data.molecularProps);
         setMyMW(molecularProps.mw);
     }
 
@@ -139,6 +139,7 @@ const App = () => {
     const myCallback = (data)=> {
         setMyHELM(data.helm)
     }
+
     const myCallback2 = (data)=> {
         setMyHELM2(data.helm)
     }
@@ -166,6 +167,9 @@ const App = () => {
 }
 export default App;
 ``` 
+
+Reference the guide to the useHWE hook to see more examples and an in-depth description of the inputs and outputs for the useHWE hook:
+> [Guide to useHWE hook](useHWE.md)
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
