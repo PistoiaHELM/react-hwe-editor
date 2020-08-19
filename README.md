@@ -107,8 +107,7 @@ const App = () => {
     // details about all viewerProps 
     viewerProps.displayMolecularProperties = false;
     viewerProps.viewerCallback = (data) => {
-        let molecularProps = data.molecularProps;
-        setMyMW(molecularProps.mw);
+        setMyMW(data.molecularProps.mw);
     }
 
     return(
@@ -145,8 +144,7 @@ const App = () => {
     }
 
     const myCallback3 = (data) => {
-        const molecularProps = data.molecularProps;
-        setMyMW(molecularProps.mw)
+        setMyMW(data.molecularProps.mw)
     }
 
     viewerProps.viewerCallback = myCallback;
