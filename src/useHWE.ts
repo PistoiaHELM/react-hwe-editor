@@ -59,7 +59,7 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
         initHELM: initHELM,
         customConfig: customConfig,
         viewerCallback: viewerCallback,
-        displayMolecularProperties: true,
+        displayMolecularProperties: false,
         style: defaultViewerStyle,
         canvasStyle: defaultViewerCanvasStyle,
         editorPopupStyle: defaultViewerEditorPopupStyle,

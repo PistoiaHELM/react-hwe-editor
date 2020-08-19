@@ -96,6 +96,7 @@ const App = () => {
 ### **editorProps**
 Below are the properties and examples associated with the Editor react component: 
 *   initHELM: input helm notation to be rendered/analyzed by the Editor (see **Inputs** section)
+    * initialized to hook inputted initHELM string (or *""* — empty string — if none is provided)
 ```js
 // Example 1 (same as shown in Inputs section)
 const App = () => {
@@ -115,6 +116,7 @@ const App = () => {
 }
 ```
 *   customConfig: custom configuration settings for Editor (see **Inputs** section)
+    * initialized to hook inputted customConfig (or *{}* if none is provided)
 ```js
 // Example 1 (same as shown in Inputs section)
 const App = () => {
@@ -135,6 +137,7 @@ const App = () => {
 }
 ```
 *   initialCallback: separate callback function to use when the initial HELM notation loads (optional). See helmCallback for data returned.
+    * initialized to *undefined*
 ```js
 const App = () => {
   const { Editor, editorProps } = useHWE('helm');
@@ -146,6 +149,7 @@ const App = () => {
 }
 ```
 *   helmCallback: helm callback function, passes HELM Web Editor data
+    * initialized to an empty function (i.e. nothing is done with the callback data by default)
     * data returned:
         * editor_id: id of the Editor
         * canvas: svg of the Editor canvas
@@ -165,6 +169,7 @@ const App = () => {
 }
 ```
 *   rtObservation: flag for real time observation to the editor, helmCallback will get invoked when edits to the editor canvas are made (i.e. it is intended to be used with helmCallback)
+    * initialized to *false*
 ```js
 const App = () => {
   const { Editor, editorProps } = useHWE();
@@ -173,6 +178,7 @@ const App = () => {
 }
 ```
 *   hidden: hides the editor (equivalent to visibility: hidden)
+    * initialized to *false*
 ```js
 const App = () => {
   const { Editor, editorProps } = useHWE();
@@ -181,6 +187,7 @@ const App = () => {
 }
 ```
 *   style: style for HWE (edits the root div of the Editor)
+    * initialized to *{}*
 ```js
 const App = () => {
   const { Editor, editorProps } = useHWE();
@@ -215,6 +222,7 @@ const App = () => {
 ### **viewerProps**
 These are the properties and examples associated with the Viewer react component:
 *   initHELM: input helm notation to be rendered/analyzed by the Viewer (see **Inputs** section)
+    * initialized to hook inputted initHELM string (or *""* — empty string — if none is provided)
 ```js
 // Example 1 (similar to example in Inputs section)
 const App = () => {
@@ -234,6 +242,7 @@ const App = () => {
 }
 ```
 *   customConfig: custom configuration settings for Viewer (see **Inputs** section)
+    * initialized to hook inputted customConfig (or *{}* if none is provided)
 ```js
 // Example 1 (similar to example in Inputs section)
 const App = () => {
@@ -254,6 +263,7 @@ const App = () => {
 }
 ```
 *   viewerCallback: viewer callback function, passes viewer data
+    * initialized to an empty function (i.e. nothing is done with the callback data by default)
     * data returned:
         * editor_id: id of the Editor the Viewer is associated with
         * viewer_id: id of the Viewer
@@ -274,6 +284,7 @@ const App = () => {
 }
 ```
 *   displayMolecularProperties: flag for displaying molecular properties table
+    * initialized to *false*
 ```js
 const App = () => {
   const { Viewer, viewerProps } = useHWE();
@@ -283,6 +294,7 @@ const App = () => {
 }
 ```
 *   style: style for viewer (edits the root table of the Viewer)
+    * initialized to *defaultViewerStyle = { float: 'left' }*
 ```js
 const App = () => {
   const { Viewer, viewerProps } = useHWE();
@@ -291,13 +303,39 @@ const App = () => {
   // the Viewer table will load with custom styling
 }
 ```
-*   border: flag for Viewer table border
+*   canvasStyle: style for the canvas and its container in the Viewer
+    * initialized to *defaultViewerCanvasStyle = { width: '200px', height: '200px' }*
 ```js
 const App = () => {
   const { Viewer, viewerProps } = useHWE();
 
-  viewerProps.border = true;
-  // the Viewer table will render with a border
+  viewerProps.canvasStyle = { width: '400px' }
+  // the Viewer canvas (svg) and container will load with custom styling
+}
+```
+*   editorPopupStyle: style for the popup Editor the Viewer uses
+    * initialized to *defaultViewerEditorPopupStyle = {
+      width: '85%', 
+      height: '85%',
+      overflow: 'auto'
+    }*
+> Note: *overflow: 'auto'* prevents the popup Editor from spilling out of the popup container
+```js
+const App = () => {
+  const { Viewer, viewerProps } = useHWE();
+
+  viewerProps.editorPopupStyle = { width: '90%' }
+  // the Viewer's popup Editor will load with custom styling
+}
+```
+*   border: flag for Viewer table border
+    * initialized to *1*
+```js
+const App = () => {
+  const { Viewer, viewerProps } = useHWE();
+
+  viewerProps.border = false;
+  // the Viewer table will no longer render with a border
 }
 ```
 

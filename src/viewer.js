@@ -24,6 +24,8 @@ export const canvasClass = 'helmViewerCanvas'
  *   viewerCallback: viewer callback function, passes viewer data
  *   displayMolecularProperties: flag for displaying molecular properties table
  *   style: style for viewer table
+ *   canvasStyle: style for the canvas and its container in the Viewer
+ *   editorPopupStyle: style for the popup Editor the Viewer uses
  *   border: flag for viewer table border
  */
 export const Viewer = (props) => {           
@@ -44,6 +46,13 @@ export const Viewer = (props) => {
     // } 
 
     /**
+     * handle double click on the Viewer
+     * @function handleViewerDblClick
+     * opens the Editor Popup when the Viewer is double clicked
+     */
+    const handleViewerDblClick = () => { setPopupState(true) }
+
+    /**
      * callback to handle an initial helm sequence
      * @function initialHelmCallback
      * closes the HELM Web Editor after the initHELM sequence is processed
@@ -51,6 +60,7 @@ export const Viewer = (props) => {
     const initialHelmCallback = (data) => {            
         console.log('viewer ',data.editor_id);
         setOpenHWE(false);        
+        document.getElementById(viewId.current).addEventListener('dblclick', handleViewerDblClick);
     }
 
     /**
@@ -94,11 +104,12 @@ export const Viewer = (props) => {
     }
 
     useEffect(() => { // load HWE and initHELM when component mounts
-        if (props.initHELM) { setOpenHWE(true) }        
+        if (props.initHELM) { setOpenHWE(true) }          
+        else { document.getElementById(viewId.current).addEventListener('dblclick', handleViewerDblClick); }
     }, [])
 
     return(
-        <FullDiv onDoubleClick={() => { setPopupState(true) }} id={viewId.current} className={viewerClass}>
+        <FullDiv id={viewId.current} className={viewerClass}>
             <table border={props.border} cellPadding='5px' style={props.style}>
                 <tbody>
                     <tr>
@@ -107,13 +118,13 @@ export const Viewer = (props) => {
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td> Molecular Formula: <div>{mf}</div></td>
+                                        <td><b>Molecular Formula:</b><div>{mf}</div></td>
                                     </tr>
                                     <tr>
-                                        <td> Molecular Weight: <div>{mw}</div></td>
+                                        <td><b>Molecular Weight:</b><div>{mw}</div></td>
                                     </tr>
                                     <tr>
-                                        <td> Extinction Coefficient: <div>{ec}</div></td>
+                                        <td><b>Extinction Coefficient:</b><div>{ec}</div></td>
                                     </tr>
                                 </tbody>
                             </table>
