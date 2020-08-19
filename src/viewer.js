@@ -1,20 +1,18 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import HWE, { uuidv4 } from './hwe';
 import Styled from 'styled-components';
 import Popup from 'reactjs-popup';
 
 const FullDiv = Styled.div`
     overflow: auto;
+    font-family:Arial; 
+    background-color: white;
+    font-size: 15px;
+    color: black;
 `;
 
-// popup editor modal style
-const popUpStyle = {
-    width: '85%', 
-    height: '85%',
-    overflow: 'auto'
-}
-
 export const viewerClass = 'helmViewer';
+export const canvasClass = 'helmViewerCanvas'
 
 /**
  * HELM Web Editor Viewer Component
@@ -28,7 +26,7 @@ export const viewerClass = 'helmViewer';
  *   style: style for viewer table
  *   border: flag for viewer table border
  */
-export const Viewer = (props) => {       
+export const Viewer = (props) => {           
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
     const [helm, setHELM] = useState(props.initHELM);   // TODO MAKE NEW HELM VAR DIFFERENT FROM initHELM 
     const [mf, setMF] = useState('');
@@ -36,22 +34,23 @@ export const Viewer = (props) => {
     const [ec, setEC] = useState('0');
 
     // state variables to keep track of editors and viewers
-    const [openHWE, setOpenHWE] = useState(Boolean(helm));
+    const [openHWE, setOpenHWE] = useState(false);
     const [popupState, setPopupState] = useState(false);
-    const viewId = useRef(uuidv4());
+    const viewId = useRef(uuidv4());    
 
     // if (helm != props.initHELM) {
     //     setHELM(props.initHELM);
     //     setOpenHWE(true);
-    // }
+    // } 
 
     /**
      * callback to handle an initial helm sequence
      * @function initialHelmCallback
      * closes the HELM Web Editor after the initHELM sequence is processed
      */
-    const initialHelmCallback = () => {
-        setOpenHWE(false);
+    const initialHelmCallback = (data) => {            
+        console.log('viewer ',data.editor_id);
+        setOpenHWE(false);        
     }
 
     /**
@@ -62,9 +61,9 @@ export const Viewer = (props) => {
      */
     const cropSVG = (svg) => {
         let bbox = svg.getBBox();
-        svg.setAttribute('width', bbox.width + 5 + 'px');
-        svg.setAttribute('height', bbox.height + 5 + 'px');
-        svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);     
+        svg.setAttribute('width', props.canvasStyle.width);
+        svg.setAttribute('height', props.canvasStyle.height); // todo make surround td same size
+        svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
     }
 
     /**
@@ -75,9 +74,9 @@ export const Viewer = (props) => {
      */
     const viewerHelmCallback = (data) => {        
         data.view_id = viewId.current;
-        let canvas = document.getElementById(viewId.current).getElementsByTagName('td')[0];
-        canvas.innerHTML = data.canvas.outerHTML;
-        cropSVG(canvas.childNodes[0]);
+        let canvasContainer = document.getElementById(viewId.current).getElementsByClassName(canvasClass)[0];
+        canvasContainer.innerHTML = data.canvas.outerHTML;
+        cropSVG(canvasContainer.childNodes[0]);
         setHELM(data.helm);
         setMF(data.molecularProps.mf);
         setMW(data.molecularProps.mw);
@@ -94,23 +93,27 @@ export const Viewer = (props) => {
         helmCallback: viewerHelmCallback
     }
 
+    useEffect(() => { // load HWE and initHELM when component mounts
+        if (props.initHELM) { setOpenHWE(true) }        
+    }, [])
+
     return(
         <FullDiv onDoubleClick={() => { setPopupState(true) }} id={viewId.current} className={viewerClass}>
-            <table border={props.tableBorder} cellPadding='5px' style={props.style}>
+            <table border={props.border} cellPadding='5px' style={props.style}>
                 <tbody>
                     <tr>
-                        <td />
+                        <td style={props.canvasStyle} className={canvasClass}/>
                         <td hidden={!props.displayMolecularProperties}>
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td> Molecular Formula: {mf} </td>
+                                        <td> Molecular Formula: <div>{mf}</div></td>
                                     </tr>
                                     <tr>
-                                        <td> Molecular Weight: {mw}  </td>
+                                        <td> Molecular Weight: <div>{mw}</div></td>
                                     </tr>
                                     <tr>
-                                        <td> Extinction Coefficient: {ec} </td>
+                                        <td> Extinction Coefficient: <div>{ec}</div></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -119,7 +122,7 @@ export const Viewer = (props) => {
                 </tbody>
             </table>
             {openHWE ? <HWE {...hwePropsFromViewer} /> : null}
-            <Popup modal contentStyle={popUpStyle} open={popupState} >
+            <Popup modal contentStyle={props.editorPopupStyle} open={popupState} >
               <HWE {...hwePropsFromViewer}/>
             </Popup>
         </FullDiv>

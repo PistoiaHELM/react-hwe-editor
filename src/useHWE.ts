@@ -1,6 +1,14 @@
 import Editor from './hwe';
 import { Viewer } from './viewer'
 
+const defaultViewerStyle = { float: 'left' }
+const defaultViewerCanvasStyle = { width: '200px', height: '200px' }
+const defaultViewerEditorPopupStyle = {
+    width: '85%', 
+    height: '85%',
+    overflow: 'auto'
+}
+
 /**
  * useHWE hook
  * @function useHWE
@@ -52,9 +60,10 @@ export const useHWE = (initHELM?: string, customConfig?: object) => {
         customConfig: customConfig,
         viewerCallback: viewerCallback,
         displayMolecularProperties: true,
-        style: {},
-        tableStyle: {},
-        tableBorder: 1
+        style: defaultViewerStyle,
+        canvasStyle: defaultViewerCanvasStyle,
+        editorPopupStyle: defaultViewerEditorPopupStyle,
+        border: 1
     } 
 
 

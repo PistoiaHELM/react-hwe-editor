@@ -68,7 +68,7 @@ const HWE = (props) => {
         validateurl: '/WebService/service/Validation', 
         toolbarholder: 'toolbar',
         toolbarbuttons: [{ icon: 'canvas-1.png', label: 'Canvas' }, { icon: 'monomers-2.png', label: 'Monomer Library', url: 'MonomerLibApp.htm' }, { icon: 'settings-2.png', label: 'Ruleset', url: 'RuleSetApp.htm'}]
-      }
+    }
 
     /**
      * Get current editor tab
@@ -131,22 +131,19 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const sendHelmInfo = ((callback) => {
-        let helmContent = document.getElementById(_id);      
-        if (helmContent && helmContent.innerHTML) {             
+        let helmContent = document.getElementById(_id);         
+        if (helmContent) {
             let currentTab = getCurrentTab(helmContent);
             let helm = getHELM(helmContent);                    
             let canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
             let mapJSON = getMapJSON(helmContent);            
             currentTab.click();            
-            // return desired data through callback
-            if (callback) { 
-                callback({
-                    editor_id: _id,
-                    helm: helm,
-                    canvas: canvas,
-                    molecularProps: mapJSON
-                });
-            }
+            callback({
+                editor_id: _id,
+                helm: helm,
+                canvas: canvas,
+                molecularProps: mapJSON
+            });
         }
     });
 
@@ -176,6 +173,7 @@ const HWE = (props) => {
      * @param {Object} helmConfig - default HELM settings
      */
     const customHelmConfig = (customSettings, helmConfig) => {      
+        extraSettings();                                  
         return {...helmConfig, ...customSettings} // merge objects
     }
 
@@ -186,8 +184,7 @@ const HWE = (props) => {
      * @param {Object} customConfig
      */
     const loadHWE = (customConfig) => {    
-        extraSettings();                                  
-        let helmConfig = customHelmConfig(customConfig, defaultConfig);
+        let helmConfig = customHelmConfig(customConfig, defaultConfig);        
         window.org.helm.webeditor.Adapter.startApp(_id, helmConfig);
     }
 
@@ -200,11 +197,12 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const loadinitHELM = (initHELM, callback) => {        
-        const helmContent = document.getElementById(_id);           
+        const helmContent = document.getElementById(_id);    
         const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point        
             helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML = initHELM;
-            helmContent.querySelector('button[title="Apply HELM Notation"]').click();
-            sendHelmInfo(callback);
+            helmContent.querySelector('button[title="Apply HELM Notation"]').click();            
+            console.log('load ',_id,Date.now());
+            sendHelmInfo(callback);            
             observ.disconnect(); // disconnect after helm is loaded
         });
         observer.observe(helmContent, { // detects any changes to childNodes
@@ -243,9 +241,11 @@ const HWE = (props) => {
             observeCanvas(canvasDiv, helmCallback);        
             observ.disconnect();
         });
-        observer.observe(parent, { // detect when helm loads in
-            childList: true,
-        });
+        if (parent) {
+            observer.observe(parent, { // detect when helm loads in
+                childList: true,
+            });
+        }
     }
 
     /**
@@ -257,18 +257,20 @@ const HWE = (props) => {
      * @param {function} callback 
      */
     const checkForInitHelm = (initHELM, callback) => {
-        if (initHELM) { 
-            loadinitHELM(initHELM, callback); 
-         } 
+        if (initHELM) { loadinitHELM(initHELM, callback); } 
     }
     
-    useEffect(() => {                         
+    useEffect(() => {        
         if (props.rtObservation) { startRealTimeObservation(document.getElementById(_id), props.helmCallback); }        
         loadHWEDeps().then(() => {
+            console.log('mount',_id, Date.now());
+            
             loadHWE(props.customConfig);                  
             (props.initialCallback ? checkForInitHelm(props.initHELM, props.initialCallback) : checkForInitHelm(props.initHELM, props.helmCallback));
         });
-        return () => {            
+        return () => {   
+            console.log('unmount',_id,Date.now());
+            
             sendHelmInfo(props.helmCallback);           
             if (trackObserver.current) { trackObserver.current.disconnect(); }
             window.scil.disconnectAll();
