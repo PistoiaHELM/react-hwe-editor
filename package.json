@@ -1,6 +1,6 @@
 {
   "name": "@pistoiahelm/react-hwe-editor",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "React based implementation of HELM Web Editor.",
   "author": "Joshua Ren",
   "license": "MIT",
@@ -55,7 +55,7 @@
     "dist"
   ],
   "dependencies": {
-    "@pistoiahelm/react-hwe-deps": "^1.5.2",
+    "@pistoiahelm/react-hwe-deps": "^1.5.3",
     "reactjs-popup": "^1.5.0",
     "styled-components": "^5.1.1"
   }

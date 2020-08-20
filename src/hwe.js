@@ -132,19 +132,18 @@ const HWE = (props) => {
      */
     const sendHelmInfo = ((callback) => {
         let helmContent = document.getElementById(_id);         
-        if (helmContent) {
-            let currentTab = getCurrentTab(helmContent);
-            let helm = getHELM(helmContent);                    
-            let canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
-            let mapJSON = getMapJSON(helmContent);            
-            currentTab.click();            
-            callback({
-                editor_id: _id,
-                helm: helm,
-                canvas: canvas,
-                molecularProps: mapJSON
-            });
-        }
+        if (!(helmContent && helmContent.innerHTML)) { return; }
+        let currentTab = getCurrentTab(helmContent);
+        let helm = getHELM(helmContent);                    
+        let canvas = helmContent.getElementsByTagName('svg')[0].cloneNode(true);  
+        let mapJSON = getMapJSON(helmContent);            
+        currentTab.click();            
+        callback({
+            editor_id: _id,
+            helm: helm,
+            canvas: canvas,
+            molecularProps: mapJSON
+        });
     });
 
     /**
@@ -197,11 +196,11 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const loadinitHELM = (initHELM, callback) => {        
-        const helmContent = document.getElementById(_id);    
+        const helmContent = document.getElementById(_id);  
+        if (!helmContent) { return; }
         const observer = new MutationObserver((_mutations, observ) => { // HWE is loaded at this point        
             helmContent.querySelectorAll('div[contenteditable="true"]')[1].innerHTML = initHELM;
             helmContent.querySelector('button[title="Apply HELM Notation"]').click();            
-            console.log('load ',_id,Date.now());
             sendHelmInfo(callback);            
             observ.disconnect(); // disconnect after helm is loaded
         });
@@ -218,6 +217,7 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const observeCanvas = (parent, helmCallback) => {
+        if (!parent) { return; }
         const observer = new MutationObserver((_mutations, observ) => {                        
             if (!trackObserver.current || (observ !== trackObserver.current)) { trackObserver.current = observ; }
             sendHelmInfo(helmCallback);                        
@@ -261,16 +261,16 @@ const HWE = (props) => {
     }
     
     useEffect(() => {        
-        if (props.rtObservation) { startRealTimeObservation(document.getElementById(_id), props.helmCallback); }        
+        let helmContent = document.getElementById(_id);
+        if (!helmContent) return; 
+        console.log(helmContent);
+        
+        if (props.rtObservation) { startRealTimeObservation(helmContent, props.helmCallback); }
         loadHWEDeps().then(() => {
-            console.log('mount',_id, Date.now());
-            
             loadHWE(props.customConfig);                  
             (props.initialCallback ? checkForInitHelm(props.initHELM, props.initialCallback) : checkForInitHelm(props.initHELM, props.helmCallback));
         });
         return () => {   
-            console.log('unmount',_id,Date.now());
-            
             sendHelmInfo(props.helmCallback);           
             if (trackObserver.current) { trackObserver.current.disconnect(); }
             window.scil.disconnectAll();

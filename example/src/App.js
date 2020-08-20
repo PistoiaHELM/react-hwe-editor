@@ -1,38 +1,24 @@
 import React, {useState} from 'react';
 import { useHWE } from 'react-hwe-editor';
 
-const App = () => {
-    const { Editor, editorProps, Viewer, viewerProps } = useHWE('helm');
+const App = () => { // make control group
+    const [myHELM, setMyHELM] = useState('helm');
+    const [myHELM2, setMyHELM2] = useState('asdf');
+    const { Viewer, viewerProps } = useHWE(myHELM);
 
-    const [myHELM, setMyHELM] = useState();
-    const [myHELM2, setMyHELM2] = useState();
-    const [myMW, setMyMW] = useState();
+    const viewerProps2 = {...viewerProps, ...{ initHELM: myHELM2 }}
 
-    const myCallback = (data)=> {
-        setMyHELM(data.helm);
+    const handleChange = (e) => {
+        let input = e.target.value;
+        setMyHELM2(input);
     }
-
-    const myCallback2 = (data)=> {
-        setMyHELM2(data.helm);
-    }
-
-    const myCallback3 = (data) => {
-        setMyMW(data.molecularProps.mw);
-    }
-
-    viewerProps.viewerCallback = myCallback;
-    const viewerProps2 = {...viewerProps, ...{viewerCallback: myCallback2, initHELM: 'pqpq'}}
-    const viewerProps3 = {...viewerProps, ...{viewerCallback: myCallback3, initHELM: 'asdfassdf'}}
 
     return(
         <div className='App'>  
             <h1>Welcome to my HELM Web Editor Viewer App!</h1>
-            <h4>HELM for viewer 1: {myHELM} </h4>
-            <h4>HELM for viewer 2: {myHELM2} </h4>
-            <h4>Molecular weight for viewer 3: {myMW} </h4>
             <Viewer {...viewerProps}/>
-            <Viewer {...viewerProps2} />
-            <Viewer {...viewerProps3} />
+            <h4>HWE input for Viewer 2: <input onChange={ handleChange }/></h4>
+            <Viewer {...viewerProps2}/>
         </div>
     );
 }

@@ -28,9 +28,10 @@ export const canvasClass = 'helmViewerCanvas'
  *   editorPopupStyle: style for the popup Editor the Viewer uses
  *   border: flag for viewer table border
  */
-export const Viewer = (props) => {           
+export const Viewer = (props) => {         
     // stores helm notation, molecular formulas, molecular weights, extinction coefficients
-    const [helm, setHELM] = useState(props.initHELM);   // TODO MAKE NEW HELM VAR DIFFERENT FROM initHELM 
+    const [helm, setHELM] = useState(props.initHELM);    
+    const prevInitHELM = useRef(props.initHELM);
     const [mf, setMF] = useState('');
     const [mw, setMW] = useState('0');
     const [ec, setEC] = useState('0');
@@ -39,11 +40,6 @@ export const Viewer = (props) => {
     const [openHWE, setOpenHWE] = useState(false);
     const [popupState, setPopupState] = useState(false);
     const viewId = useRef(uuidv4());    
-
-    // if (helm != props.initHELM) {
-    //     setHELM(props.initHELM);
-    //     setOpenHWE(true);
-    // } 
 
     /**
      * handle double click on the Viewer
@@ -58,7 +54,6 @@ export const Viewer = (props) => {
      * closes the HELM Web Editor after the initHELM sequence is processed
      */
     const initialHelmCallback = (data) => {            
-        console.log('viewer ',data.editor_id);
         setOpenHWE(false);        
         document.getElementById(viewId.current).addEventListener('dblclick', handleViewerDblClick);
     }
@@ -72,7 +67,7 @@ export const Viewer = (props) => {
     const cropSVG = (svg) => {
         let bbox = svg.getBBox();
         svg.setAttribute('width', props.canvasStyle.width);
-        svg.setAttribute('height', props.canvasStyle.height); // todo make surround td same size
+        svg.setAttribute('height', props.canvasStyle.height);
         svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
     }
 
@@ -82,12 +77,12 @@ export const Viewer = (props) => {
      * the callback function for the viewer's HELM Web Editor
      * @param {Object} data 
      */
-    const viewerHelmCallback = (data) => {        
+    const viewerHelmCallback = (data) => {            
         data.view_id = viewId.current;
         let canvasContainer = document.getElementById(viewId.current).getElementsByClassName(canvasClass)[0];
         canvasContainer.innerHTML = data.canvas.outerHTML;
         cropSVG(canvasContainer.childNodes[0]);
-        setHELM(data.helm);
+        setHELM(data.helm);        
         setMF(data.molecularProps.mf);
         setMW(data.molecularProps.mw);
         setEC(data.molecularProps.ec);
@@ -104,9 +99,25 @@ export const Viewer = (props) => {
     }
 
     useEffect(() => { // load HWE and initHELM when component mounts
-        if (props.initHELM) { setOpenHWE(true) }          
-        else { document.getElementById(viewId.current).addEventListener('dblclick', handleViewerDblClick); }
-    }, [])
+        let initHELM = props.initHELM;
+        if (initHELM && (prevInitHELM.current != initHELM)) {
+            console.log('AAAA', initHELM);
+            prevInitHELM.current = initHELM; // update previous value
+            setHELM(prevInitHELM.current);
+            setOpenHWE(true);
+        } else if (initHELM) { 
+            console.log('BBBB', initHELM);
+            setOpenHWE(true);
+        } else { 
+            console.log('CCCC', initHELM);
+            setOpenHWE(false);
+            prevInitHELM.current = initHELM; // update previous value
+            setHELM(prevInitHELM.current);
+            let viewerContent = document.getElementById(viewId.current);
+            viewerContent.addEventListener('dblclick', handleViewerDblClick); // make popup available
+            viewerContent.getElementsByClassName(canvasClass)[0].innerHTML = null; // clear canvas
+        }
+    }, [props.initHELM])
 
     return(
         <FullDiv id={viewId.current} className={viewerClass}>
