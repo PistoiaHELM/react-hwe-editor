@@ -101,15 +101,12 @@ export const Viewer = (props) => {
     useEffect(() => { // load HWE and initHELM when component mounts
         let initHELM = props.initHELM;
         if (initHELM && (prevInitHELM.current != initHELM)) {
-            console.log('AAAA', initHELM);
             prevInitHELM.current = initHELM; // update previous value
             setHELM(prevInitHELM.current);
             setOpenHWE(true);
         } else if (initHELM) { 
-            console.log('BBBB', initHELM);
             setOpenHWE(true);
         } else { 
-            console.log('CCCC', initHELM);
             setOpenHWE(false);
             prevInitHELM.current = initHELM; // update previous value
             setHELM(prevInitHELM.current);

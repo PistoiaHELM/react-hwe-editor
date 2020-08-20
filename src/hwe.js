@@ -262,9 +262,6 @@ const HWE = (props) => {
     
     useEffect(() => {        
         let helmContent = document.getElementById(_id);
-        if (!helmContent) return; 
-        console.log(helmContent);
-        
         if (props.rtObservation) { startRealTimeObservation(helmContent, props.helmCallback); }
         loadHWEDeps().then(() => {
             loadHWE(props.customConfig);                  
