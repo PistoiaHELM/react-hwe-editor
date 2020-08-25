@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { useHWE } from 'react-hwe-editor';
+import { useHWE } from '@pistoiahelm/react-hwe-editor';
 
 const App = () => { // make control group
     const [myHELM, setmyHELM] = useState('asdf');

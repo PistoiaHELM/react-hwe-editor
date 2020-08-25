@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "file:../node_modules/react",
     "react-dom": "file:../node_modules/react-dom",
-    "react-hwe-editor": "file:..",
+    "@pistoiahelm/react-hwe-editor": "file:..",
     "react-scripts": "file:../node_modules/react-scripts",
     "styled-components": "file:../node_modules/styled-components"
   },
@@ -28,5 +28,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy":"http://webeditor.openhelm.org"
+  "proxy": "http://webeditor.openhelm.org"
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import HWE, { uuidv4 } from './hwe';
+import HWE, { uuidv4 } from './editor';
 import Styled from 'styled-components';
 import Popup from 'reactjs-popup';
 

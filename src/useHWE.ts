@@ -1,4 +1,4 @@
-import Editor from './hwe';
+import Editor from './editor';
 import { Viewer } from './viewer'
 
 const defaultViewerStyle = { float: 'left' }
