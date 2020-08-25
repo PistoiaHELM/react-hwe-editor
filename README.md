@@ -22,9 +22,10 @@ The HELM Web Editor react (HWE) is a react based implementation of HELM. The web
 ## Install
 
 ```bash
-npm install --save styled-components
-npm install --save reactjs-popup
-npm install --save @pistoiahelm/react-hwe-editor --registry=https://npm.pkg.github.com
+npm i
+npm i --save styled-components
+npm i --save reactjs-popup
+npm i --save @pistoiahelm/react-hwe-editor --registry=https://npm.pkg.github.com
 ```
 
 ## Link to NPM Package
