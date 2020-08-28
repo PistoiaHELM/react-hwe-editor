@@ -236,16 +236,15 @@ const HWE = (props) => {
      * @param {function} helmCallback - The HWE parent callback function
      */
     const startRealTimeObservation = (parent, helmCallback) => {   
+        if (!parent) { return; }
         const observer = new MutationObserver((_mutations, observ) => {
             let canvasDiv = parent.getElementsByTagName('svg')[0].parentNode;
             observeCanvas(canvasDiv, helmCallback);        
             observ.disconnect();
         });
-        if (parent) {
-            observer.observe(parent, { // detect when helm loads in
-                childList: true,
-            });
-        }
+        observer.observe(parent, { // detect when helm loads in
+            childList: true,
+        });
     }
 
     /**
@@ -270,7 +269,7 @@ const HWE = (props) => {
         return () => {   
             sendHelmInfo(props.helmCallback);           
             if (trackObserver.current) { trackObserver.current.disconnect(); }
-            window.scil.disconnectAll();
+            if (window.scil) window.scil.disconnectAll();
         }
     }, [props]);
 
