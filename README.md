@@ -31,7 +31,7 @@ npm i --save @pistoiahelm/react-hwe-editor --registry=https://npm.pkg.github.com
 ## Link to NPM Package
 > [react-hwe-editor](https://github.com/PistoiaHELM/react-hwe-editor/packages/317570) 
 
-# useHWE #
+# useHWE
 
 The useHWE react hook has several parameters to note (examples in the **Usage** section below): 
 
@@ -41,10 +41,39 @@ The useHWE react hook has several parameters to note (examples in the **Usage** 
 The following is a link to a much more in-depth description of the inputs and outputs for the useHWE hook:
 > [Guide to useHWE hook](useHWE.md)
 
-If you want to use the default urls for monomer dbs, include a proxy to http://webeditor.openhelm.org in your own project's package.json: 
+## proxying
+If you want to use the default urls for monomer dbs in your node development environment, include a proxy to http://webeditor.openhelm.org in your own project's package.json: 
 
 ```js
 "proxy": "http://webeditor.openhelm.org"
+```
+
+If deploying to an nginx server, consider the following conf file setup to help guide your own implementation:
+```
+worker_processes  1;
+worker_rlimit_nofile 8192;
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  server {
+    listen 80;
+    server_name localhost;
+    root /usr/local/etc/nginx/build;
+    index index.html;
+
+    location /HELM2MonomerService/rest/ { 
+      proxy_pass http://webeditor.openhelm.org;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header Host $host;
+      proxy_cache_bypass $http_upgrade;
+    }
+  }
+}
 ```
 
 ## Usage
